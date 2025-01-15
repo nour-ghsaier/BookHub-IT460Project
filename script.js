@@ -8,36 +8,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('modal');
     const modalContent = document.getElementById('modalContent');
 
+    const API_KEY = process.env.Bookhub_API_KEY || 'default_key'; 
+    const MAX_RESULTS = process.env.Max_Result || 60;
     // Search form submission
     searchForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const query = searchInput.value.trim();
         if (!query) return;
 
-        startMessageDiv.classList.add('hidden');
-        resultsDiv.classList.add('hidden');
-        noResultsDiv.classList.add('hidden');
-        loadingDiv.classList.remove('hidden');
+        resultsDiv.innerHTML = "Loading...";
 
         try {
             const response = await fetch(
-                `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=40`
+                `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&key=${API_KEY}&maxResults=${MAX_RESULTS}`
             );
             const data = await response.json();
-
-            if (data.items && data.items.length > 0) {
-                displayResults(data.items);
-                resultsDiv.classList.remove('hidden');
-            } else {
-                noResultsDiv.classList.remove('hidden');
-            }
+            resultsDiv.innerHTML = data.items ? JSON.stringify(data.items, null, 2) : "No results found.";
         } catch (error) {
             console.error('Error fetching books:', error);
-            noResultsDiv.classList.remove('hidden');
-        } finally {
-            loadingDiv.classList.add('hidden');
+            resultsDiv.innerHTML = "Error fetching data.";
         }
     });
+});
 
     // Display search results
     function displayResults(books) {
