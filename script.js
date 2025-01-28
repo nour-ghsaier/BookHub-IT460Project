@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => { 
     const searchForm = document.getElementById('searchForm');
     const searchInput = document.getElementById('searchInput');
     const resultsDiv = document.getElementById('results');
@@ -8,28 +8,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('modal');
     const modalContent = document.getElementById('modalContent');
 
-    const API_KEY = process.env.Bookhub_API_KEY || 'default_key'; 
-    const MAX_RESULTS = process.env.Max_Result || 60;
+    const CONFIG = {
+        RESULTS_PER_PAGE: 20, // Number of results per page
+        DEFAULT_CATEGORY: "information technology", // Default search category
+        API_KEY: "default_key"
+    };
+
     // Search form submission
     searchForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const query = searchInput.value.trim();
+        const query = searchInput.value.trim() || CONFIG.DEFAULT_CATEGORY;
         if (!query) return;
 
         resultsDiv.innerHTML = "Loading...";
 
         try {
             const response = await fetch(
-                `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&key=${API_KEY}&maxResults=${MAX_RESULTS}`
+                `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=${CONFIG.RESULTS_PER_PAGE}`
             );
             const data = await response.json();
-            resultsDiv.innerHTML = data.items ? JSON.stringify(data.items, null, 2) : "No results found.";
+            if (data.items) {
+                displayResults(data.items);
+            } else {
+                resultsDiv.innerHTML = "No results found.";
+            }
         } catch (error) {
             console.error('Error fetching books:', error);
             resultsDiv.innerHTML = "Error fetching data.";
         }
     });
-});
 
     // Display search results
     function displayResults(books) {
@@ -114,3 +121,4 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.classList.add('hidden');
         }
     });
+});
