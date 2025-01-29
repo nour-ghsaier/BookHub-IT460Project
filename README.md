@@ -7,6 +7,7 @@ Bookhub is an interactive and user-friendly web-based platform designed for book
 - JavaScript
 - CSS
 - HTML
+- PHP
 # Deployment
 The project is deployed on OpenShift and utilizes webhooks for automatic updates. It also supports autoscaling to ensure optimal performance under varying loads.
 # How to Run Locally
